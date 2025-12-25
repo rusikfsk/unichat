@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/deploy/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="UniChat.Api/UniChat.Api.csproj" />
+  <Project Path="UniChat.Application/UniChat.Application.csproj" />
+  <Project Path="UniChat.Domain/UniChat.Domain.csproj" />
+  <Project Path="UniChat.Infrastructure/UniChat.Infrastructure.csproj" />
+</Solution>

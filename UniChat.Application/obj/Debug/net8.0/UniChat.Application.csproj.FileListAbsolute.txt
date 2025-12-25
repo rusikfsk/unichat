@@ -1,0 +1,15 @@
+E:\UniChat\UniChat.Application\bin\Debug\net8.0\UniChat.Application.deps.json
+E:\UniChat\UniChat.Application\bin\Debug\net8.0\UniChat.Application.dll
+E:\UniChat\UniChat.Application\bin\Debug\net8.0\UniChat.Application.pdb
+E:\UniChat\UniChat.Application\bin\Debug\net8.0\UniChat.Domain.dll
+E:\UniChat\UniChat.Application\bin\Debug\net8.0\UniChat.Domain.pdb
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.csproj.AssemblyReference.cache
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.GeneratedMSBuildEditorConfig.editorconfig
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.AssemblyInfoInputs.cache
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.AssemblyInfo.cs
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.csproj.CoreCompileInputs.cache
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat..97F47CBC.Up2Date
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.dll
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\refint\UniChat.Application.dll
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.pdb
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\ref\UniChat.Application.dll

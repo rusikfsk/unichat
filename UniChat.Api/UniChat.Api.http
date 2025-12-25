@@ -1,0 +1,6 @@
+@UniChat.Api_HostAddress = http://localhost:5001
+
+GET {{UniChat.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
