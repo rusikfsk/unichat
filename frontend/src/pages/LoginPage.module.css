@@ -104,3 +104,10 @@
   color: #ff6b6b;
   font-size: 13px;
 }
+
+.shell {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}

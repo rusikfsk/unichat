@@ -27,53 +27,63 @@ export function LoginPage() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.brand}>
-          <div className={styles.logo}>U</div>
-          <div>
-            <div className={styles.title}>UniChat</div>
-            <div className={styles.sub}>Sign in to continue</div>
+    <div className={styles.shell}>
+      <div className={styles.page}>
+        <div className={styles.card}>
+          <div className={styles.brand}>
+            <div className={styles.logo}>U</div>
+            <div>
+              <div className={styles.title}>UniChat</div>
+              <div className={styles.sub}>Sign in to continue</div>
+            </div>
           </div>
+
+          <div className={styles.tabs}>
+            <button
+              type="button"
+              className={mode === 'login' ? styles.tabActive : styles.tab}
+              onClick={() => setMode('login')}
+            >
+              Login
+            </button>
+
+            <button
+              type="button"
+              className={mode === 'register' ? styles.tabActive : styles.tab}
+              onClick={() => setMode('register')}
+            >
+              Register
+            </button>
+          </div>
+
+          <form onSubmit={onSubmit} className={styles.form}>
+            <label className={styles.label}>Username</label>
+            <input
+              className={styles.input}
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              placeholder="yourname"
+              autoComplete="username"
+            />
+
+            <label className={styles.label}>Password</label>
+            <input
+              className={styles.input}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              type="password"
+              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+            />
+
+            {err && <div className={styles.error}>{err}</div>}
+
+            <button className={styles.primary} disabled={busy}>
+              {busy ? 'Please wait…' : mode === 'login' ? 'Login' : 'Create account'}
+            </button>
+          </form>
         </div>
-
-        <div className={styles.tabs}>
-          <button className={mode === 'login' ? styles.tabActive : styles.tab} onClick={() => setMode('login')}>
-            Login
-          </button>
-          <button className={mode === 'register' ? styles.tabActive : styles.tab} onClick={() => setMode('register')}>
-            Register
-          </button>
-        </div>
-
-        <form onSubmit={onSubmit} className={styles.form}>
-          <label className={styles.label}>Username</label>
-          <input
-            className={styles.input}
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            placeholder="yourname"
-            autoComplete="username"
-          />
-
-          <label className={styles.label}>Password</label>
-          <input
-            className={styles.input}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            type="password"
-            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-          />
-
-          {err && <div className={styles.error}>{err}</div>}
-
-          <button className={styles.primary} disabled={busy}>
-            {busy ? 'Please wait…' : mode === 'login' ? 'Login' : 'Create account'}
-          </button>
-        </form>
       </div>
     </div>
   )
 }
-

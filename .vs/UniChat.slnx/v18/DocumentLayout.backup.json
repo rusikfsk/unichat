@@ -19,12 +19,12 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "UniChat.Application",
+              "Title": "UniChat.Application.csproj",
               "DocumentMoniker": "E:\\UniChat\\UniChat.Application\\UniChat.Application.csproj",
               "RelativeDocumentMoniker": "UniChat.Application\\UniChat.Application.csproj",
               "ToolTip": "E:\\UniChat\\UniChat.Application\\UniChat.Application.csproj",
               "RelativeToolTip": "UniChat.Application\\UniChat.Application.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2025-12-25T20:49:58.423Z",
               "EditorCaption": ""

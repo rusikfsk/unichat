@@ -1,0 +1,76 @@
+.app {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  background: #0b0c0f;
+  color: #e6e6e6;
+}
+
+.sidebar {
+  border-right: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  display: flex;
+  flex-direction: column;
+  min-width: 280px;
+}
+
+.sidebarTop {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  position: sticky;
+  top: 0;
+  background: rgba(11,12,15,0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.menuBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.06);
+  color: #e6e6e6;
+  cursor: pointer;
+}
+
+.search {
+  flex: 1;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  color: #e6e6e6;
+  padding: 0 12px;
+  outline: none;
+}
+
+.content {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  background: #0b0c0f;
+}
+
+/* 📱 мобилка: показываем один экран */
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+  }
+  .content {
+    display: none;
+  }
+}
+
+.chatList {
+  padding: 12px;
+}
+
+.chatStub {
+  opacity: 0.6;
+}
