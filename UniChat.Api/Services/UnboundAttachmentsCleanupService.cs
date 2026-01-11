@@ -8,7 +8,6 @@ public sealed class UnboundAttachmentsCleanupService : BackgroundService
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<UnboundAttachmentsCleanupService> _logger;
 
-    
     private static readonly TimeSpan CleanupInterval = TimeSpan.FromHours(1);
     private static readonly TimeSpan MaxAge = TimeSpan.FromHours(24);
 
@@ -45,10 +44,13 @@ public sealed class UnboundAttachmentsCleanupService : BackgroundService
     private async Task CleanupOnce(CancellationToken ct)
     {
         using var scope = _scopeFactory.CreateScope();
+
         var db = scope.ServiceProvider.GetRequiredService<UniChatDbContext>();
+        var storage = scope.ServiceProvider.GetRequiredService<IFileStorage>();
 
         var cutoff = DateTimeOffset.UtcNow - MaxAge;
 
+        // берём список "старых" непривязанных вложений
         var old = await db.Attachments
             .Where(a => a.MessageId == null && a.CreatedAt < cutoff)
             .Select(a => new { a.Id, a.StoragePath })
@@ -56,31 +58,40 @@ public sealed class UnboundAttachmentsCleanupService : BackgroundService
 
         if (old.Count == 0) return;
 
-        // удаляем из БД
-        var ids = old.Select(x => x.Id).ToList();
-        var entities = await db.Attachments.Where(a => ids.Contains(a.Id)).ToListAsync(ct);
+        // 1) сначала пытаемся удалить объекты из MinIO
+        // (даже если не получилось — мы не должны оставлять мусор в БД навсегда)
+        var deletedObjects = 0;
+        var failedObjects = 0;
 
-        db.Attachments.RemoveRange(entities);
-        await db.SaveChangesAsync(ct);
-
-        // удаляем с диска
-        var deletedFiles = 0;
         foreach (var a in old)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(a.StoragePath) && File.Exists(a.StoragePath))
+                if (!string.IsNullOrWhiteSpace(a.StoragePath))
                 {
-                    File.Delete(a.StoragePath);
-                    deletedFiles++;
+                    await storage.DeleteAsync(a.StoragePath, ct);
+                    deletedObjects++;
                 }
             }
             catch
             {
-                //  пропускаем
+                failedObjects++;
             }
         }
 
-        _logger.LogInformation("Cleanup removed {Count} unbound attachments, deletedFiles={DeletedFiles}", old.Count, deletedFiles);
+        // 2) удаляем записи из БД
+        var ids = old.Select(x => x.Id).ToList();
+        var entities = await db.Attachments
+            .Where(a => ids.Contains(a.Id))
+            .ToListAsync(ct);
+
+        db.Attachments.RemoveRange(entities);
+        await db.SaveChangesAsync(ct);
+
+        _logger.LogInformation(
+            "Cleanup removed {Count} unbound attachments, deletedObjects={DeletedObjects}, failedObjects={FailedObjects}",
+            old.Count,
+            deletedObjects,
+            failedObjects);
     }
 }

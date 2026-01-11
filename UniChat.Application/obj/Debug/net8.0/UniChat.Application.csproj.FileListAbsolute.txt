@@ -8,6 +8,7 @@ E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.GeneratedMSB
 E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.AssemblyInfoInputs.cache
 E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.AssemblyInfo.cs
 E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.csproj.CoreCompileInputs.cache
+E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.sourcelink.json
 E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat..97F47CBC.Up2Date
 E:\UniChat\UniChat.Application\obj\Debug\net8.0\UniChat.Application.dll
 E:\UniChat\UniChat.Application\obj\Debug\net8.0\refint\UniChat.Application.dll

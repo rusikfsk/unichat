@@ -11,6 +11,7 @@ E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\UniChat.Infrastructure.Genera
 E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\UniChat.Infrastructure.AssemblyInfoInputs.cache
 E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\UniChat.Infrastructure.AssemblyInfo.cs
 E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\UniChat.Infrastructure.csproj.CoreCompileInputs.cache
+E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\UniChat.Infrastructure.sourcelink.json
 E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\UniChat..149DDC46.Up2Date
 E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\UniChat.Infrastructure.dll
 E:\UniChat\UniChat.Infrastructure\obj\Debug\net8.0\refint\UniChat.Infrastructure.dll

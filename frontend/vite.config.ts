@@ -1,22 +1,10 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import { defineConfig } from "vite"
+import react from "@vitejs/plugin-react"
+import tsconfigPaths from "vite-tsconfig-paths"
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tsconfigPaths()],
   server: {
-    port: 5173,
-    proxy: {
-      '/api': {
-        target: 'https://localhost:7006',
-        changeOrigin: true,
-        secure: false,
-      },
-      '/hubs': {
-        target: 'https://localhost:7006',
-        changeOrigin: true,
-        secure: false,
-        ws: true,
-      },
-    },
-  },
+    port: 5173
+  }
 })

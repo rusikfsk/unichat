@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using UniChat.Api.Auth;
 using UniChat.Api.Contracts.Conversations;
 using UniChat.Api.Hubs;
+using UniChat.Api.Services;
 using UniChat.Domain.Entities;
 using UniChat.Infrastructure.Persistence;
 
@@ -17,11 +18,13 @@ public sealed class ConversationsController : ControllerBase
 {
     private readonly UniChatDbContext _db;
     private readonly IHubContext<ChatHub> _hub;
+    private readonly IFileStorage _storage;
 
-    public ConversationsController(UniChatDbContext db, IHubContext<ChatHub> hub)
+    public ConversationsController(UniChatDbContext db, IHubContext<ChatHub> hub, IFileStorage storage)
     {
         _db = db;
         _hub = hub;
+        _storage = storage;
     }
 
     [HttpGet]
@@ -96,15 +99,16 @@ public sealed class ConversationsController : ControllerBase
             .Join(_db.Users,
                 m => m.UserId,
                 u => u.Id,
-                (m, u) => new MemberDto(
-                    u.Id,
-                    u.UserName,
-                    m.Role,
-                    m.Permissions,
-                    m.JoinedAt,
-                    m.LastReadAt
-                ))
-            .OrderBy(x => x.UserName)
+                (m, u) => new { m, u })
+            .OrderBy(x => x.u.UserName)
+            .Select(x => new MemberDto(
+                x.u.Id,
+                x.u.UserName,
+                x.m.Role,
+                x.m.Permissions,
+                x.m.JoinedAt,
+                x.m.LastReadAt
+            ))
             .ToListAsync();
 
         return Ok(new ConversationDetailsDto(conv.Id, conv.Type, conv.Title, conv.OwnerId, conv.CreatedAt, members));
@@ -418,7 +422,7 @@ public sealed class ConversationsController : ControllerBase
         // обновляем conversation
         conv.OwnerId = req.NewOwnerId;
 
-        // старого owner сделаем Admin со всеми правами (или можешь сделать Member — скажи)
+        // старого owner сделаем Admin со всеми правами 
         oldOwner.Role = MemberRole.Admin;
         oldOwner.Permissions = (ChannelPermissions.Write |
                                 ChannelPermissions.Invite |
@@ -478,6 +482,7 @@ public sealed class ConversationsController : ControllerBase
                 return Forbid();
         }
 
+        // Собираем список объектов в хранилище, которые нужно удалить
         var attachmentRows = await _db.Attachments
             .Where(a => a.MessageId != null &&
                         _db.Messages.Any(m => m.Id == a.MessageId.Value && m.ConversationId == conversationId))
@@ -501,14 +506,18 @@ public sealed class ConversationsController : ControllerBase
 
         await _db.SaveChangesAsync();
 
+        // Удаляем объекты из MinIO (best-effort)
         foreach (var a in attachmentRows)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(a.StoragePath) && System.IO.File.Exists(a.StoragePath))
-                    System.IO.File.Delete(a.StoragePath);
+                if (!string.IsNullOrWhiteSpace(a.StoragePath))
+                    await _storage.DeleteAsync(a.StoragePath);
             }
-            catch { }
+            catch
+            {
+                // best-effort
+            }
         }
 
         await _hub.Clients.Group(conversationId.ToString()).SendAsync("conversation_deleted", new

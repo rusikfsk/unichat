@@ -6,6 +6,7 @@ using UniChat.Api.Auth;
 using UniChat.Api.Contracts.Attachments;
 using UniChat.Api.Contracts.Messages;
 using UniChat.Api.Hubs;
+using UniChat.Api.Services;
 using UniChat.Domain.Entities;
 using UniChat.Infrastructure.Persistence;
 
@@ -18,14 +19,15 @@ public sealed class MessagesController : ControllerBase
 {
     private readonly UniChatDbContext _db;
     private readonly IHubContext<ChatHub> _hub;
+    private readonly IFileStorage _storage;
 
-    public MessagesController(UniChatDbContext db, IHubContext<ChatHub> hub)
+    public MessagesController(UniChatDbContext db, IHubContext<ChatHub> hub, IFileStorage storage)
     {
         _db = db;
         _hub = hub;
+        _storage = storage;
     }
 
-    // GET /api/messages?conversationId=...&take=50&beforeMessageId=...
     [HttpGet]
     public async Task<ActionResult<List<MessageDto>>> Get(
         [FromQuery] Guid conversationId,
@@ -42,9 +44,9 @@ public sealed class MessagesController : ControllerBase
 
         if (membership == null) return Forbid();
 
-        DateTimeOffset? beforeCreatedAt = null;
+        DateTimeOffset? anchorCreatedAt = null;
+        Guid? anchorId = null;
 
-        // Если задан beforeMessageId — найдём CreatedAt этого сообщения и будем брать строго "старее"
         if (beforeMessageId.HasValue && beforeMessageId.Value != Guid.Empty)
         {
             var anchor = await _db.Messages
@@ -55,21 +57,18 @@ public sealed class MessagesController : ControllerBase
             if (anchor == null)
                 return BadRequest("beforeMessageId not found in this conversation.");
 
-            beforeCreatedAt = anchor.CreatedAt;
+            anchorCreatedAt = anchor.CreatedAt;
+            anchorId = anchor.Id;
         }
 
-        // Берём по убыванию (страница формируется сверху вниз), потом развернём в хронологию
         var query = _db.Messages
             .Where(m => m.ConversationId == conversationId);
 
-        if (beforeCreatedAt.HasValue)
+        if (anchorCreatedAt.HasValue && anchorId.HasValue)
         {
-            // строго старее чем anchor:
-            // 1) CreatedAt < anchor.CreatedAt
-            // 2) на случай совпадения CreatedAt (редко) — используем Id как tie-breaker:
             query = query.Where(m =>
-                m.CreatedAt < beforeCreatedAt.Value ||
-                (m.CreatedAt == beforeCreatedAt.Value && m.Id != beforeMessageId!.Value));
+                m.CreatedAt < anchorCreatedAt.Value ||
+                (m.CreatedAt == anchorCreatedAt.Value && m.Id.CompareTo(anchorId.Value) < 0));
         }
 
         var page = await query
@@ -83,14 +82,28 @@ public sealed class MessagesController : ControllerBase
                 m.SenderId,
                 m.Text,
                 m.CreatedAt,
+                m.ReplyToMessageId,
                 SenderUserName = _db.Users
                     .Where(u => u.Id == m.SenderId)
                     .Select(u => u.UserName)
-                    .FirstOrDefault()!
+                    .FirstOrDefault()!,
+                Reply = _db.Messages
+                    .Where(r => m.ReplyToMessageId != null && r.Id == m.ReplyToMessageId)
+                    .Select(r => new
+                    {
+                        r.Id,
+                        r.SenderId,
+                        r.Text,
+                        r.CreatedAt,
+                        SenderUserName = _db.Users
+                            .Where(u => u.Id == r.SenderId)
+                            .Select(u => u.UserName)
+                            .FirstOrDefault()!
+                    })
+                    .FirstOrDefault()
             })
             .ToListAsync();
 
-        // переворачиваем в хронологическом порядке
         page.Reverse();
 
         var messageIds = page.Select(x => x.Id).ToList();
@@ -121,14 +134,22 @@ public sealed class MessagesController : ControllerBase
                 x.ConversationId,
                 x.SenderId,
                 x.SenderUserName ?? "",
-                x.Text,
+                x.Text ?? "",
                 x.CreatedAt,
+                x.ReplyToMessageId,
+                x.Reply == null
+                    ? null
+                    : new ReplyPreviewDto(
+                        x.Reply.Id,
+                        x.Reply.SenderId,
+                        x.Reply.SenderUserName ?? "",
+                        x.Reply.Text ?? "",
+                        x.Reply.CreatedAt
+                    ),
                 attByMsg.TryGetValue(x.Id, out var list) ? list : new List<AttachmentDto>()
             ))
             .ToList();
 
-        // Авто-read только когда грузим "последние" (т.е. без beforeMessageId)
-        // Иначе при скролле вверх читать "старые" не нужно.
         if (dtos.Count > 0 && !beforeMessageId.HasValue)
         {
             var lastAt = dtos[^1].CreatedAt;
@@ -150,7 +171,6 @@ public sealed class MessagesController : ControllerBase
         return Ok(dtos);
     }
 
-    // POST /api/messages
     [HttpPost]
     public async Task<ActionResult<MessageDto>> Create(CreateMessageRequest req)
     {
@@ -185,6 +205,32 @@ public sealed class MessagesController : ControllerBase
             (membership.Permissions & ChannelPermissions.Write) != ChannelPermissions.Write)
             return Forbid();
 
+        Guid? replyToId = null;
+        ReplyPreviewDto? replyPreview = null;
+
+        if (req.ReplyToMessageId.HasValue && req.ReplyToMessageId.Value != Guid.Empty)
+        {
+            var found = await _db.Messages
+                .Where(m => m.ConversationId == req.ConversationId && m.Id == req.ReplyToMessageId.Value)
+                .Select(m => new
+                {
+                    m.Id,
+                    m.SenderId,
+                    m.Text,
+                    m.CreatedAt,
+                    SenderUserName = _db.Users
+                        .Where(u => u.Id == m.SenderId)
+                        .Select(u => u.UserName)
+                        .FirstOrDefault()!
+                })
+                .SingleOrDefaultAsync();
+
+            if (found == null) return BadRequest("ReplyToMessageId not found in this conversation.");
+
+            replyToId = found.Id;
+            replyPreview = new ReplyPreviewDto(found.Id, found.SenderId, found.SenderUserName ?? "", found.Text ?? "", found.CreatedAt);
+        }
+
         var senderName = await _db.Users
             .Where(u => u.Id == me)
             .Select(u => u.UserName)
@@ -213,6 +259,7 @@ public sealed class MessagesController : ControllerBase
             ConversationId = req.ConversationId,
             SenderId = me,
             Text = text,
+            ReplyToMessageId = replyToId,
             CreatedAt = DateTimeOffset.UtcNow
         };
 
@@ -235,8 +282,10 @@ public sealed class MessagesController : ControllerBase
             msg.ConversationId,
             msg.SenderId,
             senderName,
-            msg.Text,
+            msg.Text ?? "",
             msg.CreatedAt,
+            msg.ReplyToMessageId,
+            replyPreview,
             attDtos);
 
         await _hub.Clients.Group(req.ConversationId.ToString())
@@ -253,17 +302,16 @@ public sealed class MessagesController : ControllerBase
         return Ok(dto);
     }
 
-    // DELETE /api/messages/{messageId}
     [HttpDelete("{messageId:guid}")]
-    public async Task<IActionResult> Delete(Guid messageId)
+    public async Task<IActionResult> Delete(Guid messageId, CancellationToken ct)
     {
         var me = User.GetUserId();
 
-        var msg = await _db.Messages.SingleOrDefaultAsync(m => m.Id == messageId);
+        var msg = await _db.Messages.SingleOrDefaultAsync(m => m.Id == messageId, ct);
         if (msg == null) return NotFound();
 
         var membership = await _db.Memberships
-            .SingleOrDefaultAsync(m => m.ConversationId == msg.ConversationId && m.UserId == me);
+            .SingleOrDefaultAsync(m => m.ConversationId == msg.ConversationId && m.UserId == me, ct);
 
         if (membership == null) return Forbid();
 
@@ -276,21 +324,23 @@ public sealed class MessagesController : ControllerBase
 
         var atts = await _db.Attachments
             .Where(a => a.MessageId == msg.Id)
-            .ToListAsync();
+            .ToListAsync(ct);
 
         _db.Attachments.RemoveRange(atts);
         _db.Messages.Remove(msg);
 
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
 
         foreach (var a in atts)
         {
             try
             {
-                if (!string.IsNullOrWhiteSpace(a.StoragePath) && System.IO.File.Exists(a.StoragePath))
-                    System.IO.File.Delete(a.StoragePath);
+                if (!string.IsNullOrWhiteSpace(a.StoragePath))
+                    await _storage.DeleteAsync(a.StoragePath, ct);
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         await _hub.Clients.Group(msg.ConversationId.ToString())
@@ -298,12 +348,11 @@ public sealed class MessagesController : ControllerBase
             {
                 conversationId = msg.ConversationId,
                 messageId = msg.Id
-            });
+            }, ct);
 
         return NoContent();
     }
 
-    // POST /api/messages/read
     public record MarkReadRequest(Guid ConversationId, Guid? LastMessageId);
 
     [HttpPost("read")]

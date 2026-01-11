@@ -11,6 +11,7 @@
           "BCrypt.Net-Next": "4.0.3",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.22",
           "Microsoft.EntityFrameworkCore.Design": "8.0.22",
+          "Minio": "7.0.0",
           "Serilog.AspNetCore": "10.0.0",
           "Swashbuckle.AspNetCore": "8.1.4",
           "UniChat.Application": "1.0.0",
@@ -26,6 +27,14 @@
           "lib/net6.0/BCrypt.Net-Next.dll": {
             "assemblyVersion": "4.0.3.0",
             "fileVersion": "4.0.3.0"
+          }
+        }
+      },
+      "CommunityToolkit.HighPerformance/8.4.0": {
+        "runtime": {
+          "lib/net8.0/CommunityToolkit.HighPerformance.dll": {
+            "assemblyVersion": "8.4.0.0",
+            "fileVersion": "8.4.0.1"
           }
         }
       },
@@ -553,6 +562,21 @@
           }
         }
       },
+      "Minio/7.0.0": {
+        "dependencies": {
+          "CommunityToolkit.HighPerformance": "8.4.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
+          "Microsoft.Extensions.Logging": "10.0.0",
+          "System.IO.Hashing": "9.0.4",
+          "System.Reactive": "6.0.1"
+        },
+        "runtime": {
+          "lib/net8.0/Minio.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.0.0.0"
+          }
+        }
+      },
       "Mono.TextTemplating/2.2.1": {
         "dependencies": {
           "System.CodeDom": "4.4.0"
@@ -823,11 +847,27 @@
           }
         }
       },
+      "System.IO.Hashing/9.0.4": {
+        "runtime": {
+          "lib/net8.0/System.IO.Hashing.dll": {
+            "assemblyVersion": "9.0.0.4",
+            "fileVersion": "9.0.425.16305"
+          }
+        }
+      },
       "System.IO.Pipelines/10.0.0": {
         "runtime": {
           "lib/net8.0/System.IO.Pipelines.dll": {
             "assemblyVersion": "10.0.0.0",
             "fileVersion": "10.0.25.52411"
+          }
+        }
+      },
+      "System.Reactive/6.0.1": {
+        "runtime": {
+          "lib/net6.0/System.Reactive.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.1.7420"
           }
         }
       },
@@ -861,6 +901,7 @@
       },
       "UniChat.Application/1.0.0": {
         "dependencies": {
+          "Minio": "7.0.0",
           "Swashbuckle.AspNetCore": "8.1.4",
           "UniChat.Domain": "1.0.0"
         },
@@ -873,6 +914,7 @@
       },
       "UniChat.Domain/1.0.0": {
         "dependencies": {
+          "Minio": "7.0.0",
           "Swashbuckle.AspNetCore": "8.1.4"
         },
         "runtime": {
@@ -885,6 +927,7 @@
       "UniChat.Infrastructure/1.0.0": {
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "8.0.22",
+          "Minio": "7.0.0",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.11",
           "Swashbuckle.AspNetCore": "8.1.4",
           "UniChat.Application": "1.0.0",
@@ -911,6 +954,13 @@
       "sha512": "sha512-W+U9WvmZQgi5cX6FS5GDtDoPzUCV4LkBLkywq/kRZhuDwcbavOzcDAr3LXJFqHUi952Yj3LEYoWW0jbEUQChsA==",
       "path": "bcrypt.net-next/4.0.3",
       "hashPath": "bcrypt.net-next.4.0.3.nupkg.sha512"
+    },
+    "CommunityToolkit.HighPerformance/8.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-flxspiBs0G/0GMp7IK2J2ijV9bTG6hEwFc/z6ekHqB6nwRJ4Ry2yLdx+TkbCUYFCl4XhABkAwomeKbT6zM2Zlg==",
+      "path": "communitytoolkit.highperformance/8.4.0",
+      "hashPath": "communitytoolkit.highperformance.8.4.0.nupkg.sha512"
     },
     "Humanizer.Core/2.14.1": {
       "type": "package",
@@ -1136,6 +1186,13 @@
       "path": "microsoft.openapi/1.6.23",
       "hashPath": "microsoft.openapi.1.6.23.nupkg.sha512"
     },
+    "Minio/7.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GiCD0koYBM8/VCXRkrfSzOtySEmrA2ngceJuxRO5H+/uGodiTX+XPaUHQq9/1DpaeBxWnkmrgqu52dwuZqIYgw==",
+      "path": "minio/7.0.0",
+      "hashPath": "minio.7.0.0.nupkg.sha512"
+    },
     "Mono.TextTemplating/2.2.1": {
       "type": "package",
       "serviceable": true,
@@ -1311,12 +1368,26 @@
       "path": "system.identitymodel.tokens.jwt/7.1.2",
       "hashPath": "system.identitymodel.tokens.jwt.7.1.2.nupkg.sha512"
     },
+    "System.IO.Hashing/9.0.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WogPvgAFqQORFD8Iyha6RZ+/1QB3dsWRWxbwi8/HHVgiGQ8z0oMWpwe8Kk3Ti+Roe+P6a3sBg+WwBfEsyziZKg==",
+      "path": "system.io.hashing/9.0.4",
+      "hashPath": "system.io.hashing.9.0.4.nupkg.sha512"
+    },
     "System.IO.Pipelines/10.0.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-M1eb3nfXntaRJPrrMVM9EFS8I1bDTnt0uvUS6QP/SicZf/ZZjydMD5NiXxfmwW/uQwaMDP/yX2P+zQN1NBHChg==",
       "path": "system.io.pipelines/10.0.0",
       "hashPath": "system.io.pipelines.10.0.0.nupkg.sha512"
+    },
+    "System.Reactive/6.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rHaWtKDwCi9qJ3ObKo8LHPMuuwv33YbmQi7TcUK1C264V3MFnOr5Im7QgCTdLniztP3GJyeiSg5x8NqYJFqRmg==",
+      "path": "system.reactive/6.0.1",
+      "hashPath": "system.reactive.6.0.1.nupkg.sha512"
     },
     "System.Text.Encodings.Web/10.0.0": {
       "type": "package",

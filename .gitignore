@@ -1,0 +1,21 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build artifacts
+**/bin/
+**/obj/
+
+# Rider
+.idea/
+
+# Node
+**/node_modules/
+frontend/.env
+
+# OS
+.DS_Store
+Thumbs.db

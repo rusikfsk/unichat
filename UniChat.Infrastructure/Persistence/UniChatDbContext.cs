@@ -13,11 +13,18 @@ public class UniChatDbContext : DbContext
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-
+    public DbSet<MessageHide> MessageHides => Set<MessageHide>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>().HasIndex(x => x.UserName).IsUnique();
+        modelBuilder.Entity<User>().HasIndex(x => x.Email).IsUnique();
+
+        modelBuilder.Entity<User>()
+            .HasOne<Attachment>()
+            .WithMany()
+            .HasForeignKey(x => x.AvatarAttachmentId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Conversation>()
             .HasMany(x => x.Members)
@@ -29,7 +36,6 @@ public class UniChatDbContext : DbContext
             .WithOne()
             .HasForeignKey(x => x.MessageId);
 
-        // быстрые выборки истории сообщений
         modelBuilder.Entity<Message>()
             .HasIndex(x => new { x.ConversationId, x.CreatedAt });
 
@@ -43,5 +49,12 @@ public class UniChatDbContext : DbContext
             b.Property(x => x.CreatedAt).IsRequired();
             b.Property(x => x.ExpiresAt).IsRequired();
         });
+
+        modelBuilder.Entity<MessageHide>()
+            .HasIndex(x => new { x.UserId, x.MessageId })
+            .IsUnique();
+
+        modelBuilder.Entity<MessageHide>()
+            .HasIndex(x => x.MessageId);
     }
 }

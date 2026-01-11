@@ -186,7 +186,24 @@ namespace UniChat.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("AvatarAttachmentId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("EmailConfirmationTokenHash")
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("EmailConfirmedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordHash")
@@ -198,6 +215,11 @@ namespace UniChat.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AvatarAttachmentId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("UserName")
                         .IsUnique();
@@ -219,6 +241,14 @@ namespace UniChat.Infrastructure.Migrations
                         .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("UniChat.Domain.Entities.User", b =>
+                {
+                    b.HasOne("UniChat.Domain.Entities.Attachment", null)
+                        .WithMany()
+                        .HasForeignKey("AvatarAttachmentId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("UniChat.Domain.Entities.Conversation", b =>

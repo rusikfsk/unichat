@@ -9,5 +9,7 @@ public record MessageDto(
     string SenderUserName,
     string Text,
     DateTimeOffset CreatedAt,
+    Guid? ReplyToMessageId,
+    ReplyPreviewDto? ReplyTo,
     List<AttachmentDto> Attachments
 );

@@ -1,12 +1,13 @@
 E:\UniChat\UniChat.Domain\bin\Debug\net8.0\UniChat.Domain.deps.json
 E:\UniChat\UniChat.Domain\bin\Debug\net8.0\UniChat.Domain.dll
 E:\UniChat\UniChat.Domain\bin\Debug\net8.0\UniChat.Domain.pdb
+E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.csproj.AssemblyReference.cache
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.GeneratedMSBuildEditorConfig.editorconfig
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.AssemblyInfoInputs.cache
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.AssemblyInfo.cs
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.csproj.CoreCompileInputs.cache
+E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.sourcelink.json
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.dll
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\refint\UniChat.Domain.dll
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.pdb
 E:\UniChat\UniChat.Domain\obj\Debug\net8.0\ref\UniChat.Domain.dll
-E:\UniChat\UniChat.Domain\obj\Debug\net8.0\UniChat.Domain.csproj.AssemblyReference.cache

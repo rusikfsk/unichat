@@ -3,6 +3,6 @@
 public record CreateMessageRequest(
     Guid ConversationId,
     string Text,
-    List<Guid>? AttachmentIds
+    List<Guid>? AttachmentIds,
+    Guid? ReplyToMessageId
 );
-

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/deploy/">
     <File Path="docker-compose.yml" />
+    <File Path="nginx.conf" />
   </Folder>
   <Project Path="UniChat.Api/UniChat.Api.csproj" />
   <Project Path="UniChat.Application/UniChat.Application.csproj" />
